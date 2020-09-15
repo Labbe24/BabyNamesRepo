@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -26,18 +27,35 @@ namespace BabyNames.App
             InitializeComponent();
         }
 
+        public List<List<BabyName>> babyMatrix = new List<List<BabyName>>();
         public List<BabyName> listOfBabyNames = new List<BabyName>();
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
 
-            var lines = File.ReadLines("babynames.txt").Take(10).ToList();
+            var lines = File.ReadLines("babynames.txt");
             foreach (var line in lines)
             {
                 listOfBabyNames.Add(new BabyName(line));
             }
 
-            ListDecadeTopNames.ItemsSource = lines;
+            for (int year = 1900; year <= 2000; year += 10)
+            {
+                List<BabyName> topTenBabyNames = new List<BabyName>();
+                foreach (var baby in listOfBabyNames)
+                {
+
+                    if ((baby.Rank(year) > 0) && (baby.Rank(year) < 11))
+                    {
+                        topTenBabyNames.Add(baby);
+                    }
+                }
+
+                babyMatrix.Add(topTenBabyNames);
+            }
+
+            ListDecadeTopNames.ItemsSource = listOfBabyNames.ToString();
         }
+
     }
 }
